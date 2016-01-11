@@ -39,21 +39,17 @@ public class TemplateGrid extends Grid {
         setColumnOrder("dataColumn", "inputColumn", "dataType");
         
         setEditors();
-        wrapperContainer.addGeneratedProperty("delete", new PropertyValueGenerator<String>() {
-            @Override
-            public String getValue(Item item, Object itemId, Object propertyId) {
-                return "Delete";
-            }
-
-            @Override
-            public Class<String> getType() {
-                return String.class;
-            }
-        });
-        getColumn("delete").setRenderer(new ButtonRenderer(event -> {
-            Object itemId = event.getItemId();
-            templateManager.getContainer().removeItem(itemId);
-        }));
+//        wrapperContainer.addGeneratedProperty("delete", new PropertyValueGenerator<String>() {
+//            @Override
+//            public String getValue(Item item, Object itemId, Object propertyId) {
+//                return "Delete";
+//            }
+//
+//            @Override
+//            public Class<String> getType() {
+//                return String.class;
+//            }
+//        });
         getColumns().stream().forEach(c -> c.setSortable(false));
         setHeaderVisible(true);
     }

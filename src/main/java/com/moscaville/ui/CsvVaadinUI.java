@@ -59,10 +59,15 @@ public class CsvVaadinUI extends UI {
         MenuItem miAddTemplateProperty = miTemplates.addItem("Add Property", (MenuItem selectedItem) -> {
             templateManager.addProperty();
         });
-        MenuItem miDeleteTemplateProperty = miTemplates.addItem("Delete Property", menuCommand);
-        miDeleteTemplateProperty.setEnabled(false);
+        MenuItem miDeleteTemplateProperty = miTemplates.addItem("Delete Property", (MenuItem selectedItem) -> {
+            Object itemId = templateGrid.getSelectedRow();
+            if (itemId != null) {
+                templateManager.getContainer().removeItem(itemId);
+            }
+        });
+        //miDeleteTemplateProperty.setEnabled(false);
         MenuItem miOpenDataFile = miDataFile.addItem("Open", null, menuCommand);
-        
+
     }
 
 }
