@@ -5,12 +5,12 @@
  */
 package com.moscaville.ui;
 
+import com.moscaville.manager.TemplateManager;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
@@ -20,9 +20,7 @@ public class CsvVaadinUI extends UI {
 
     private VerticalLayout mainLayout;
     private TemplateGrid templateGrid;
-    private Button btnLoadData;
-    private Button btnOpenConfigurationFile;
-    private Button btnNewConfigurationFile;
+    private TemplateManager templateManager;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
@@ -32,35 +30,39 @@ public class CsvVaadinUI extends UI {
 
     private void buildMainLayout() {
         mainLayout = new VerticalLayout();
+        buildMenu();
         mainLayout.setSpacing(true);
-        mainLayout.addComponent(buildButtonLayout());
         templateGrid = new TemplateGrid();
+        templateManager = new TemplateManager();
+        templateGrid.setTemplateManager(templateManager);
         mainLayout.addComponent(templateGrid);
     }
-    
-    private HorizontalLayout buildButtonLayout() {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setSpacing(true);
-        buttonLayout.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
-        
-        btnNewConfigurationFile = new Button("New", (Button.ClickEvent event) -> {
 
-        });
-        btnNewConfigurationFile.setDescription("Create new template");        
-        buttonLayout.addComponent(btnNewConfigurationFile);
+    private void buildMenu() {
+        MenuBar mainMenu = new MenuBar();
+        mainLayout.addComponent(mainMenu);
 
-        btnOpenConfigurationFile = new Button("Open", (Button.ClickEvent event) -> {
-            
+        MenuBar.Command menuCommand = (MenuItem selectedItem) -> {
+            System.out.println(selectedItem.getDescription());
+        };
+
+        MenuItem miTemplates = mainMenu.addItem("Template", null, null);
+        MenuItem miDataFile = mainMenu.addItem("Data", null, null);
+
+        MenuItem miNewTemplate = miTemplates.addItem("New", null, menuCommand);
+        MenuItem miOpenTemplate = miTemplates.addItem("Open", (MenuItem selectedItem) -> {
+            templateManager.loadTemplate();
         });
-        btnOpenConfigurationFile.setDescription("Open template file");
-        buttonLayout.addComponent(btnOpenConfigurationFile);
-        
-        btnLoadData = new Button("Load", (Button.ClickEvent event) -> {
-            
+        MenuItem miSaveTemplate = miTemplates.addItem("Save", (MenuItem selectedItem) -> {
+            templateManager.saveTemplate();
         });
-        btnLoadData.setDescription("Load data");
-        buttonLayout.addComponent(btnLoadData);
+        MenuItem miAddTemplateProperty = miTemplates.addItem("Add Property", (MenuItem selectedItem) -> {
+            templateManager.addProperty();
+        });
+        MenuItem miDeleteTemplateProperty = miTemplates.addItem("Delete Property", menuCommand);
+        miDeleteTemplateProperty.setEnabled(false);
+        MenuItem miOpenDataFile = miDataFile.addItem("Open", null, menuCommand);
         
-        return buttonLayout;
     }
+
 }

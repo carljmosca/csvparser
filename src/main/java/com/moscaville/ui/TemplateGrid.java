@@ -28,12 +28,11 @@ public class TemplateGrid extends Grid {
     private final String[] DATA_TYPES = {"Date", "Integer", "String"};
 
     public TemplateGrid() {
-        init();
+
     }
 
     private void init() {
         setEditorEnabled(true);
-        templateManager = new TemplateManager();
         wrapperContainer = new GeneratedPropertyContainer(templateManager.getContainer());
         wrapperContainer.removeContainerProperty("id");
         setContainerDataSource(wrapperContainer);
@@ -67,4 +66,14 @@ public class TemplateGrid extends Grid {
         getColumn("inputColumn").setEditorField(cmbInputColumn);
     }
 
+    public TemplateManager getTemplateManager() {
+        return templateManager;
+    }
+
+    public void setTemplateManager(TemplateManager templateManager) {
+        this.templateManager = templateManager;
+        init();
+    }
+    
+    
 }
