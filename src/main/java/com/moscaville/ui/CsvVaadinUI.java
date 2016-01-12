@@ -21,16 +21,19 @@ public class CsvVaadinUI extends UI {
     private VerticalLayout mainLayout;
     private TemplateGrid templateGrid;
     private TemplateManager templateManager;
+    private FileChooser fileChooser;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         buildMainLayout();
         setContent(mainLayout);
+        fileChooser = new FileChooser();
     }
 
     private void buildMainLayout() {
         mainLayout = new VerticalLayout();
         buildMenu();
+        //buildFileChooser();
         mainLayout.setSpacing(true);
         templateGrid = new TemplateGrid();
         templateManager = new TemplateManager();
@@ -66,8 +69,11 @@ public class CsvVaadinUI extends UI {
             }
         });
         //miDeleteTemplateProperty.setEnabled(false);
-        MenuItem miOpenDataFile = miDataFile.addItem("Open", null, menuCommand);
+        MenuItem miOpenDataFile = miDataFile.addItem("Open", (MenuItem selectedItem) -> {
+            addWindow(fileChooser);
+        });
 
     }
+
 
 }
