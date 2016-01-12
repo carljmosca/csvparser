@@ -5,6 +5,7 @@
  */
 package com.moscaville.ui;
 
+import com.moscaville.util.Utility;
 import com.vaadin.data.util.FilesystemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
@@ -40,7 +41,7 @@ public class FileChooser extends Window {
     }
 
     private void buildFileChooser() {
-        File folder = new File("/Users/moscac/Downloads");
+        File folder = new File(Utility.getEnvironmentVariable(Utility.DATA_DIRECTORY, "."));
         FilesystemContainer container = new FilesystemContainer(folder);
         fileChooser = new TreeTable("Data Files");
         fileChooser.setContainerDataSource(container);
@@ -61,7 +62,7 @@ public class FileChooser extends Window {
         btnSelect.setEnabled(false);
         btnSelect.addClickListener((Button.ClickEvent event) -> {
             File selectedFile = (File)fileChooser.getValue();
-            fileName = selectedFile.getName();
+            fileName = selectedFile.getAbsoluteFile().getAbsolutePath();
             close();
         });
         buttonLayout.addComponent(btnSelect);
