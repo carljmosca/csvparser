@@ -36,15 +36,16 @@ public class CsvVaadinUI extends UI {
     }
 
     private void buildMainLayout() {
+        setSizeFull();
         mainLayout = new VerticalLayout();
         buildMenu();
         mainLayout.setSpacing(true);
         mainLayout.addComponent(templateGrid);
         templateGrid.setWidth("100%");
-        templateGrid.setHeight("30%");
+        templateGrid.setHeight("300px");
         mainLayout.addComponent(dataGrid);
         dataGrid.setWidth("100%");
-        dataGrid.setHeight("30%");
+        dataGrid.setHeight("300px");
         
     }
 

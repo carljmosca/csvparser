@@ -29,10 +29,12 @@ public class DataGrid extends Grid {
         setEditorEnabled(true);
         wrapperContainer = new GeneratedPropertyContainer(templateManager.getDataContainer());
         setContainerDataSource(wrapperContainer);
-        wrapperContainer.removeContainerProperty("id");
         getColumns().stream().forEach(c -> c.setSortable(false));
         setHeaderVisible(true);
         templateManager.getDataContainer().addItemSetChangeListener((Container.ItemSetChangeEvent event) -> {
+            if (getColumn("id") != null) {
+                removeColumn("id");
+            }
             //setColumns((Object)templateManager.getDataHeaders());
         });
     }

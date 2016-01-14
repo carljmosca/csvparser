@@ -54,6 +54,7 @@ public class TemplateManager {
         inputColumns = new ArrayList<>();
         container = new BeanItemContainer<>(TemplateProperty.class, templateProperties.getList());
         dataContainer = new IndexedContainer();
+        dataHeaders = new String[]{};
     }
 
     public void addProperty() {
@@ -95,7 +96,7 @@ public class TemplateManager {
         }
     }
 
-    private void readData() {
+    private void readCsvData() {
 
         CsvParserSettings parserSettings = new CsvParserSettings();
         parserSettings.setLineSeparatorDetectionEnabled(true);
@@ -108,6 +109,9 @@ public class TemplateManager {
         // get the parsed records from the RowListProcessor here.
         // Note that different implementations of RowProcessor will provide different sets of functionalities.
         dataContainer.removeAllItems();
+        for (String s : dataHeaders) {
+            dataContainer.removeContainerProperty(s);
+        }
         dataHeaders = rowProcessor.getHeaders();
         dataContainer.addContainerProperty("id", Integer.class, null);
         for (String s : dataHeaders) {
@@ -149,7 +153,7 @@ public class TemplateManager {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
-        readData();
+        readCsvData();
     }
 
     public BeanItemContainer<TemplateProperty> getContainer() {
