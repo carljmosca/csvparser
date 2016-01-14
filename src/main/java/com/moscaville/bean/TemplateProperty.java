@@ -15,8 +15,9 @@ public class TemplateProperty {
     private String inputColumn;
     private String dataColumn;
     private String dataType;
+    private boolean required;
     
-    public TemplateProperty(String inputColumn, String dataColumn, String dataType) {
+    public TemplateProperty(String inputColumn, String dataColumn, String dataType, boolean required) {
         this.id = System.currentTimeMillis();
         this.inputColumn = inputColumn;
         this.dataColumn = dataColumn;
@@ -54,6 +55,13 @@ public class TemplateProperty {
     public void setDataType(String dataType) {
         this.dataType = dataType;
     }
-    
 
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
+    }
+    
 }

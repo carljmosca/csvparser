@@ -13,32 +13,39 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringUI
 @Theme("valo")
 public class CsvVaadinUI extends UI {
 
     private VerticalLayout mainLayout;
+    @Autowired
     private TemplateGrid templateGrid;
+    @Autowired
+    private DataGrid dataGrid;
+    @Autowired
     private TemplateManager templateManager;
+    @Autowired
     private FileChooser fileChooser;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
         buildMainLayout();
         setContent(mainLayout);
-        fileChooser = new FileChooser();
     }
 
     private void buildMainLayout() {
         mainLayout = new VerticalLayout();
         buildMenu();
-        //buildFileChooser();
         mainLayout.setSpacing(true);
-        templateGrid = new TemplateGrid();
-        templateManager = new TemplateManager();
-        templateGrid.setTemplateManager(templateManager);
         mainLayout.addComponent(templateGrid);
+        templateGrid.setWidth("100%");
+        templateGrid.setHeight("30%");
+        mainLayout.addComponent(dataGrid);
+        dataGrid.setWidth("100%");
+        dataGrid.setHeight("30%");
+        
     }
 
     private void buildMenu() {

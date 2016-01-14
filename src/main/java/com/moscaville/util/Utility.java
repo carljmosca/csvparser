@@ -12,9 +12,9 @@ package com.moscaville.util;
 public class Utility {
 
     public static final String DATA_DIRECTORY = "CSVPARSER_DATA_DIRECTORY";
-    
+
     public static String getEnvironmentVariable(String name, String defaultValue) {
-        return  System.getProperty(DATA_DIRECTORY) != null ? System.getProperty(DATA_DIRECTORY) : defaultValue;
+        return System.getenv(DATA_DIRECTORY) != null ? System.getenv(DATA_DIRECTORY) : defaultValue;
     }
 
 }

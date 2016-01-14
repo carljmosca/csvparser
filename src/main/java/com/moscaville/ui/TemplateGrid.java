@@ -6,21 +6,23 @@
 package com.moscaville.ui;
 
 import com.moscaville.manager.TemplateManager;
-import com.vaadin.data.Item;
 import com.vaadin.data.util.GeneratedPropertyContainer;
-import com.vaadin.data.util.PropertyValueGenerator;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.renderers.ButtonRenderer;
 import java.util.Arrays;
+import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author moscac
  */
+@Component
 public class TemplateGrid extends Grid {
 
     //private static final String FORMAT = "%1$td/%1$tm/%1$tY %1$tH:%1$tM:%1$tS";
+    @Autowired
     private TemplateManager templateManager;
     private GeneratedPropertyContainer wrapperContainer;
     private ComboBox cmbDataType;
@@ -31,26 +33,15 @@ public class TemplateGrid extends Grid {
 
     }
 
+    @PostConstruct
     private void init() {
         setEditorEnabled(true);
         wrapperContainer = new GeneratedPropertyContainer(templateManager.getContainer());
         wrapperContainer.removeContainerProperty("id");
         setContainerDataSource(wrapperContainer);
-        setColumnOrder("dataColumn", "inputColumn", "dataType");
-        
+        setColumnOrder("dataColumn", "inputColumn", "dataType", "required");        
         setEditors();
-//        wrapperContainer.addGeneratedProperty("delete", new PropertyValueGenerator<String>() {
-//            @Override
-//            public String getValue(Item item, Object itemId, Object propertyId) {
-//                return "Delete";
-//            }
-//
-//            @Override
-//            public Class<String> getType() {
-//                return String.class;
-//            }
-//        });
-        getColumns().stream().forEach(c -> c.setSortable(false));
+        //getColumns().stream().forEach(c -> c.setSortable(false));
         setHeaderVisible(true);
     }
 
@@ -60,16 +51,6 @@ public class TemplateGrid extends Grid {
         getColumn("dataType").setEditorField(cmbDataType);
         cmbInputColumn = new ComboBox();
         getColumn("inputColumn").setEditorField(cmbInputColumn);
-    }
-
-    public TemplateManager getTemplateManager() {
-        return templateManager;
-    }
-
-    public void setTemplateManager(TemplateManager templateManager) {
-        this.templateManager = templateManager;
-        init();
-    }
-    
+    }    
     
 }

@@ -5,6 +5,7 @@
  */
 package com.moscaville.ui;
 
+import com.moscaville.manager.TemplateManager;
 import com.moscaville.util.Utility;
 import com.vaadin.data.util.FilesystemContainer;
 import com.vaadin.ui.Button;
@@ -13,11 +14,15 @@ import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.io.File;
+import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author moscac
  */
+@Component
 public class FileChooser extends Window {
 
     private TreeTable fileChooser;
@@ -25,13 +30,14 @@ public class FileChooser extends Window {
     private HorizontalLayout buttonLayout;
     private Button btnSelect;
     private Button btnCancel;
-    private String fileName;
     private boolean selected;
+    @Autowired
+    private TemplateManager templateManager;
     
     public FileChooser() {
-        init();
     }
 
+    @PostConstruct
     private void init() {
         mainLayout = new VerticalLayout();
         mainLayout.setSpacing(true);
@@ -62,7 +68,7 @@ public class FileChooser extends Window {
         btnSelect.setEnabled(false);
         btnSelect.addClickListener((Button.ClickEvent event) -> {
             File selectedFile = (File)fileChooser.getValue();
-            fileName = selectedFile.getAbsoluteFile().getAbsolutePath();
+            templateManager.setFileName(selectedFile.getAbsoluteFile().getAbsolutePath());
             close();
         });
         buttonLayout.addComponent(btnSelect);
@@ -72,10 +78,6 @@ public class FileChooser extends Window {
         });
         buttonLayout.addComponent(btnCancel);
         mainLayout.addComponent(buttonLayout);
-    }
-
-    public String getFileName() {
-        return fileName;
     }
 
     public boolean isSelected() {
