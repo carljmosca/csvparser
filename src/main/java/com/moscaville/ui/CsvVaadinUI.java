@@ -40,7 +40,7 @@ public class CsvVaadinUI extends UI {
         mainLayout = new VerticalLayout();
         buildMenu();
         mainLayout.setSpacing(true);
-        mainLayout.addComponent(templateGrid);
+        mainLayout.addComponent(templateGrid);        
         templateGrid.setWidth("100%");
         templateGrid.setHeight("300px");
         mainLayout.addComponent(dataGrid);
@@ -76,7 +76,7 @@ public class CsvVaadinUI extends UI {
                 templateManager.getContainer().removeItem(itemId);
             }
         });
-        //miDeleteTemplateProperty.setEnabled(false);
+
         MenuItem miOpenDataFile = miDataFile.addItem("Open", (MenuItem selectedItem) -> {
             addWindow(fileChooser);
         });

@@ -8,6 +8,7 @@ package com.moscaville.ui;
 import com.moscaville.manager.TemplateManager;
 import com.moscaville.util.Utility;
 import com.vaadin.data.util.FilesystemContainer;
+import com.vaadin.event.MouseEvents;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TreeTable;
@@ -33,7 +34,7 @@ public class FileChooser extends Window {
     private boolean selected;
     @Autowired
     private TemplateManager templateManager;
-    
+
     public FileChooser() {
     }
 
@@ -60,16 +61,14 @@ public class FileChooser extends Window {
         });
         mainLayout.addComponent(fileChooser);
     }
-    
+
     private void buildButtonLayout() {
         buttonLayout = new HorizontalLayout();
         buttonLayout.setSpacing(true);
         btnSelect = new Button("Select");
         btnSelect.setEnabled(false);
         btnSelect.addClickListener((Button.ClickEvent event) -> {
-            File selectedFile = (File)fileChooser.getValue();
-            templateManager.setFileName(selectedFile.getAbsoluteFile().getAbsolutePath());
-            close();
+            selectFile();
         });
         buttonLayout.addComponent(btnSelect);
         btnCancel = new Button("Cancel");
@@ -78,10 +77,24 @@ public class FileChooser extends Window {
         });
         buttonLayout.addComponent(btnCancel);
         mainLayout.addComponent(buttonLayout);
+        addClickListener((MouseEvents.ClickEvent event) -> {
+            if (event.isDoubleClick()) {
+                selectFile();
+            }
+        });
+    }
+
+    private void selectFile() {
+        if (fileChooser.getValue() == null) {
+            return;
+        }
+        File selectedFile = (File) fileChooser.getValue();
+        templateManager.setFileName(selectedFile.getAbsoluteFile().getAbsolutePath());
+        close();
     }
 
     public boolean isSelected() {
         return selected;
     }
-    
+
 }
