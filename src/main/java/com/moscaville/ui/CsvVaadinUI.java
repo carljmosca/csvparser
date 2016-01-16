@@ -7,8 +7,11 @@ package com.moscaville.ui;
 
 import com.moscaville.manager.TemplateManager;
 import com.vaadin.annotations.Theme;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.UI;
@@ -20,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CsvVaadinUI extends UI {
 
     private VerticalLayout mainLayout;
+    private HorizontalLayout buttonLayout;
     @Autowired
     private TemplateGrid templateGrid;
     @Autowired
@@ -38,50 +42,68 @@ public class CsvVaadinUI extends UI {
     private void buildMainLayout() {
         setSizeFull();
         mainLayout = new VerticalLayout();
-        buildMenu();
+        buildButtons();
+        buildTemplateGrid();
         mainLayout.setSpacing(true);
-        mainLayout.addComponent(templateGrid);        
-        templateGrid.setWidth("100%");
-        templateGrid.setHeight("300px");
         mainLayout.addComponent(dataGrid);
         dataGrid.setWidth("100%");
         dataGrid.setHeight("300px");
-        
     }
 
-    private void buildMenu() {
-        MenuBar mainMenu = new MenuBar();
-        mainLayout.addComponent(mainMenu);
+    private void buildButtons() {
+        buttonLayout = new HorizontalLayout();
+        buttonLayout.setSpacing(true);
 
-        MenuBar.Command menuCommand = (MenuItem selectedItem) -> {
-            System.out.println(selectedItem.getDescription());
-        };
+        buttonLayout.addComponent(new Button("New", FontAwesome.FILE));
 
-        MenuItem miTemplates = mainMenu.addItem("Template", null, null);
-        MenuItem miDataFile = mainMenu.addItem("Data", null, null);
-
-        MenuItem miNewTemplate = miTemplates.addItem("New", null, menuCommand);
-        MenuItem miOpenTemplate = miTemplates.addItem("Open", (MenuItem selectedItem) -> {
+        Button btnOpen = new Button("Open", FontAwesome.FILE_O);
+        btnOpen.setDescription("Open template file");
+        btnOpen.addClickListener((Button.ClickEvent event) -> {
             templateManager.loadTemplate();
         });
-        MenuItem miSaveTemplate = miTemplates.addItem("Save", (MenuItem selectedItem) -> {
+        buttonLayout.addComponent(btnOpen);
+
+        Button btnSave = new Button("Save", FontAwesome.SAVE);
+        btnSave.setDescription("Save template file");
+        btnSave.addClickListener((Button.ClickEvent event) -> {
             templateManager.saveTemplate();
         });
-        MenuItem miAddTemplateProperty = miTemplates.addItem("Add Property", (MenuItem selectedItem) -> {
+        buttonLayout.addComponent(btnSave); 
+        
+        Button btnData = new Button("Data", FontAwesome.DATABASE);
+        btnData.setDescription("Load data");
+        btnData.addClickListener((Button.ClickEvent event) -> {
+            addWindow(fileChooser);
+        });
+        buttonLayout.addComponent(btnData);
+        mainLayout.addComponent(buttonLayout);
+    }
+
+    private void buildTemplateGrid() {
+        VerticalLayout templateGridLayout = new VerticalLayout();
+        templateGridLayout.setSpacing(true);
+        templateGrid.setWidth("100%");
+        templateGrid.setHeight("300px");
+        templateGridLayout.addComponent(templateGrid);
+        HorizontalLayout tgButtonLayout = new HorizontalLayout();
+        tgButtonLayout.setSpacing(true);
+        Button btnAddTemplate = new Button("Add", FontAwesome.PLUS_SQUARE);
+        btnAddTemplate.setDescription("Add template");
+        btnAddTemplate.addClickListener((Button.ClickEvent event) -> {
             templateManager.addProperty();
         });
-        MenuItem miDeleteTemplateProperty = miTemplates.addItem("Delete Property", (MenuItem selectedItem) -> {
+        tgButtonLayout.addComponent(btnAddTemplate);
+        Button btnDeleteTemplate = new Button("Delete", FontAwesome.MINUS_SQUARE);
+        btnDeleteTemplate.setDescription("Delete template");
+        btnDeleteTemplate.addClickListener((Button.ClickEvent event) -> {
             Object itemId = templateGrid.getSelectedRow();
             if (itemId != null) {
                 templateManager.getContainer().removeItem(itemId);
             }
         });
-
-        MenuItem miOpenDataFile = miDataFile.addItem("Open", (MenuItem selectedItem) -> {
-            addWindow(fileChooser);
-        });
-
+        tgButtonLayout.addComponent(btnDeleteTemplate);
+        templateGridLayout.addComponent(tgButtonLayout);
+        mainLayout.addComponent(templateGridLayout);
     }
-
 
 }
