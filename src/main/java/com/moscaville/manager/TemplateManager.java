@@ -26,6 +26,8 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -36,16 +38,19 @@ import org.springframework.stereotype.Service;
  * @author moscac
  */
 @Service
-public class TemplateManager {
+public class TemplateManager extends Observable {
 
     private TemplateProperties templateProperties;
     private BeanItemContainer<TemplateProperty> container;
     private IndexedContainer dataContainer;
-    private String fileName;
+    private String templateFileName;
+    private String dataFileName;
     private List<String> inputColumns;
     private String[] dataHeaders;
+    private final List<Observer> observers;
 
     public TemplateManager() {
+        observers = new ArrayList<>();
     }
 
     @PostConstruct
@@ -61,8 +66,12 @@ public class TemplateManager {
         container.addBean(new TemplateProperty("", "data column", "String", false));
     }
 
+    public void newTemplate() {
+
+    }
+
     public void loadTemplate() {
-        try (Reader reader = new InputStreamReader(new FileInputStream(fileName), "UTF-8")) {
+        try (Reader reader = new InputStreamReader(new FileInputStream(templateFileName), "UTF-8")) {
             Gson gson = new GsonBuilder().create();
             TemplateProperties tp = gson.fromJson(reader, TemplateProperties.class
             );
@@ -80,7 +89,7 @@ public class TemplateManager {
     }
 
     public void saveTemplate() {
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8")) {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(templateFileName), "UTF-8")) {
             Gson gson = new GsonBuilder().create();
             TemplateProperties tp = new TemplateProperties();
             tp.getList().addAll(container.getItemIds());
@@ -135,11 +144,10 @@ public class TemplateManager {
         }
     }
 
-    public Reader getReader() {
+    private Reader getReader() {
         Reader reader = null;
         try {
-            reader = new InputStreamReader(new FileInputStream(fileName), "UTF-8");
-
+            reader = new InputStreamReader(new FileInputStream(dataFileName), "UTF-8");
         } catch (UnsupportedEncodingException | FileNotFoundException ex) {
             Logger.getLogger(TemplateManager.class
                     .getName()).log(Level.SEVERE, null, ex);
@@ -147,13 +155,28 @@ public class TemplateManager {
         return reader;
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getTemplateFileName() {
+        return templateFileName;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-        readCsvData();
+    public void setTemplateFileName(String templateFileName) {
+        this.templateFileName = templateFileName;
+    }
+
+    public String getDataFileName() {
+        return dataFileName;
+    }
+
+    public void setDataFileName(String dataFileName) {
+        this.dataFileName = dataFileName;
+        boolean processed = false;
+        if (dataFileName.toLowerCase().endsWith(".csv")) {
+            readCsvData();
+            processed = true;
+        }
+        if (processed) {
+            notifyObservers();
+        }
     }
 
     public BeanItemContainer<TemplateProperty> getContainer() {
@@ -170,6 +193,23 @@ public class TemplateManager {
 
     public IndexedContainer getDataContainer() {
         return dataContainer;
+    }
+
+    @Override
+    public void addObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void deleteObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        observers.stream().forEach((o) -> {
+            o.update(this, "");
+        });
     }
 
 }

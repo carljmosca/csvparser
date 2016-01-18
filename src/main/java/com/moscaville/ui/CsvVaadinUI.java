@@ -7,13 +7,14 @@ package com.moscaville.ui;
 
 import com.moscaville.manager.TemplateManager;
 import com.vaadin.annotations.Theme;
+import com.vaadin.data.Property;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CsvVaadinUI extends UI {
 
     private VerticalLayout mainLayout;
-    private HorizontalLayout buttonLayout;
     @Autowired
     private TemplateGrid templateGrid;
     @Autowired
@@ -32,6 +32,7 @@ public class CsvVaadinUI extends UI {
     private TemplateManager templateManager;
     @Autowired
     private FileChooser fileChooser;
+    private TextField tfTemplateFileName;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
@@ -42,7 +43,7 @@ public class CsvVaadinUI extends UI {
     private void buildMainLayout() {
         setSizeFull();
         mainLayout = new VerticalLayout();
-        buildButtons();
+        buildTemplateGridHeader();
         buildTemplateGrid();
         mainLayout.setSpacing(true);
         mainLayout.addComponent(dataGrid);
@@ -50,33 +51,56 @@ public class CsvVaadinUI extends UI {
         dataGrid.setHeight("300px");
     }
 
-    private void buildButtons() {
-        buttonLayout = new HorizontalLayout();
-        buttonLayout.setSpacing(true);
+    private void buildTemplateGridHeader() {
+        HorizontalLayout templateGridHeaderLayout = new HorizontalLayout();
+        templateGridHeaderLayout.setSpacing(true);
+        templateGridHeaderLayout.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 
-        buttonLayout.addComponent(new Button("New", FontAwesome.FILE));
+        Button btnNew = new Button("New", FontAwesome.FILE);
+        btnNew.setDescription("New template file");
+        btnNew.addClickListener((Button.ClickEvent event) -> {
+            templateManager.newTemplate();
+        });
+        templateGridHeaderLayout.addComponent(btnNew);
 
         Button btnOpen = new Button("Open", FontAwesome.FILE_O);
         btnOpen.setDescription("Open template file");
         btnOpen.addClickListener((Button.ClickEvent event) -> {
-            templateManager.loadTemplate();
+            fileChooser.setFileExtension(FileChooser.FILE_EXTENSION_TEMPLATE);
+            addWindow(fileChooser);
         });
-        buttonLayout.addComponent(btnOpen);
+        templateGridHeaderLayout.addComponent(btnOpen);
 
         Button btnSave = new Button("Save", FontAwesome.SAVE);
         btnSave.setDescription("Save template file");
+        btnSave.setImmediate(true);
+        btnSave.setEnabled(false);
         btnSave.addClickListener((Button.ClickEvent event) -> {
             templateManager.saveTemplate();
         });
-        buttonLayout.addComponent(btnSave); 
+        templateGridHeaderLayout.addComponent(btnSave); 
+        
+        tfTemplateFileName = new TextField();
+        tfTemplateFileName.setDescription("template file name");
+        tfTemplateFileName.setInputPrompt("template file name");
+        tfTemplateFileName.setImmediate(true);
+        tfTemplateFileName.addValueChangeListener((Property.ValueChangeEvent event) -> {
+            btnSave.setEnabled(tfTemplateFileName.getValue() != null && tfTemplateFileName.getValue().length() > 0);
+        });
+        templateGridHeaderLayout.addComponent(tfTemplateFileName);
         
         Button btnData = new Button("Data", FontAwesome.DATABASE);
         btnData.setDescription("Load data");
         btnData.addClickListener((Button.ClickEvent event) -> {
+            fileChooser.setFileExtension(FileChooser.FILE_EXTENSION_CSV);
             addWindow(fileChooser);
         });
-        buttonLayout.addComponent(btnData);
-        mainLayout.addComponent(buttonLayout);
+        templateGridHeaderLayout.addComponent(btnData);
+        
+        Button btnImport = new Button("Import", FontAwesome.DOWNLOAD);
+        
+        templateGridHeaderLayout.addComponent(btnImport);
+        mainLayout.addComponent(templateGridHeaderLayout);
     }
 
     private void buildTemplateGrid() {

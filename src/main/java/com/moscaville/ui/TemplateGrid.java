@@ -10,6 +10,7 @@ import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
 import java.util.Arrays;
+import java.util.Observable;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,9 +40,13 @@ public class TemplateGrid extends Grid {
         wrapperContainer = new GeneratedPropertyContainer(templateManager.getContainer());
         wrapperContainer.removeContainerProperty("id");
         setContainerDataSource(wrapperContainer);
-        setColumnOrder("dataColumn", "inputColumn", "dataType", "required");        
+        setColumnOrder("dataColumn", "inputColumn", "dataType", "required");
         setEditors();
         //getColumns().stream().forEach(c -> c.setSortable(false));
+        templateManager.addObserver((Observable o, Object arg) -> {
+            cmbInputColumn.removeAllItems();
+            cmbInputColumn.addItems(Arrays.asList(templateManager.getDataHeaders()));
+        });
         setHeaderVisible(true);
     }
 
@@ -51,6 +56,6 @@ public class TemplateGrid extends Grid {
         getColumn("dataType").setEditorField(cmbDataType);
         cmbInputColumn = new ComboBox();
         getColumn("inputColumn").setEditorField(cmbInputColumn);
-    }    
-    
+    }
+
 }

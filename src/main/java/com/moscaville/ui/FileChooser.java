@@ -32,14 +32,18 @@ public class FileChooser extends Window {
     private Button btnSelect;
     private Button btnCancel;
     private boolean selected;
+    private String fileExtension;
     @Autowired
     private TemplateManager templateManager;
+    public final static String FILE_EXTENSION_TEMPLATE = "json";
+    public final static String FILE_EXTENSION_CSV = "csv";
 
     public FileChooser() {
     }
 
     @PostConstruct
     private void init() {
+        fileExtension = "*";
         mainLayout = new VerticalLayout();
         mainLayout.setSpacing(true);
         buildFileChooser();
@@ -48,18 +52,28 @@ public class FileChooser extends Window {
     }
 
     private void buildFileChooser() {
-        File folder = new File(Utility.getEnvironmentVariable(Utility.DATA_DIRECTORY, "."));
-        FilesystemContainer container = new FilesystemContainer(folder);
         fileChooser = new TreeTable("Data Files");
-        fileChooser.setContainerDataSource(container);
-        fileChooser.setItemIconPropertyId("Icon");
-        fileChooser.setVisibleColumns(new Object[]{"Name", "Size", "Last Modified"});
         fileChooser.setImmediate(true);
         fileChooser.setSelectable(true);
         fileChooser.addListener((Event event) -> {
             btnSelect.setEnabled(fileChooser.getValue() != null);
         });
         mainLayout.addComponent(fileChooser);
+    }
+
+    private void readDirectory() {
+        String caption = "";
+        if (FILE_EXTENSION_CSV.equals(fileExtension)) {
+            caption = "Data files";
+        } else if (FILE_EXTENSION_TEMPLATE.equals(fileExtension)) {
+            caption = "Template files";
+        }
+        fileChooser.setCaption(caption);
+        File folder = new File(Utility.getEnvironmentVariable(Utility.DATA_DIRECTORY + "." + fileExtension, "."));
+        FilesystemContainer container = new FilesystemContainer(folder);
+        fileChooser.setContainerDataSource(container);
+        fileChooser.setItemIconPropertyId("Icon");
+        fileChooser.setVisibleColumns(new Object[]{"Name", "Size", "Last Modified"});
     }
 
     private void buildButtonLayout() {
@@ -89,12 +103,25 @@ public class FileChooser extends Window {
             return;
         }
         File selectedFile = (File) fileChooser.getValue();
-        templateManager.setFileName(selectedFile.getAbsoluteFile().getAbsolutePath());
+        if (FILE_EXTENSION_CSV.equals(fileExtension)) {
+            templateManager.setDataFileName(selectedFile.getAbsoluteFile().getAbsolutePath());
+        } else if (FILE_EXTENSION_TEMPLATE.equals(fileExtension)) {
+            templateManager.setTemplateFileName(selectedFile.getAbsoluteFile().getAbsolutePath());
+        }
         close();
     }
 
     public boolean isSelected() {
         return selected;
+    }
+
+    public String getFileExtension() {
+        return fileExtension;
+    }
+
+    public void setFileExtension(String fileExtension) {
+        this.fileExtension = fileExtension;
+        readDirectory();
     }
 
 }
