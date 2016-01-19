@@ -73,14 +73,6 @@ public class CsvVaadinUI extends UI {
         templateGridHeaderLayout.addComponent(btnOpen);
 
         Button btnSave = new Button("Save", FontAwesome.SAVE);
-        btnSave.setDescription("Save template file");
-        btnSave.setImmediate(true);
-        btnSave.setEnabled(false);
-        btnSave.addClickListener((Button.ClickEvent event) -> {
-            templateManager.saveTemplate();
-        });
-        templateGridHeaderLayout.addComponent(btnSave); 
-        
         tfTemplateFileName = new TextField();
         tfTemplateFileName.setDescription("template file name");
         tfTemplateFileName.setInputPrompt("template file name");
@@ -89,11 +81,19 @@ public class CsvVaadinUI extends UI {
             btnSave.setEnabled(tfTemplateFileName.getValue() != null && tfTemplateFileName.getValue().length() > 0);
         });
         templateGridHeaderLayout.addComponent(tfTemplateFileName);
-        
+
         FieldGroup binder = new FieldGroup(templateManager.getTemplateBeanItem());
         binder.setBuffered(false);
         binder.bind(tfTemplateFileName, "templateFileName");
-        
+
+        btnSave.setDescription("Save template file");
+        btnSave.setImmediate(true);
+        btnSave.setEnabled(false);
+        btnSave.addClickListener((Button.ClickEvent event) -> {
+            templateManager.saveTemplate();
+        });
+        templateGridHeaderLayout.addComponent(btnSave);
+
         Button btnData = new Button("Data", FontAwesome.DATABASE);
         btnData.setDescription("Load data");
         btnData.addClickListener((Button.ClickEvent event) -> {
@@ -101,9 +101,9 @@ public class CsvVaadinUI extends UI {
             addWindow(fileChooser);
         });
         templateGridHeaderLayout.addComponent(btnData);
-        
+
         Button btnImport = new Button("Import", FontAwesome.DOWNLOAD);
-        
+
         templateGridHeaderLayout.addComponent(btnImport);
         mainLayout.addComponent(templateGridHeaderLayout);
     }

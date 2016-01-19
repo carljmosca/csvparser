@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.moscaville.bean.Template;
 import com.moscaville.bean.TemplateProperty;
+import com.moscaville.util.Utility;
 import com.univocity.parsers.common.processor.RowListProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -48,6 +49,7 @@ public class TemplateManager {
     private List<String> inputColumns;
     private String[] dataHeaders;
     private final List<Observer> observers;
+    private String dataDirectory;
 
     public TemplateManager() {
         observers = new ArrayList<>();
@@ -55,6 +57,7 @@ public class TemplateManager {
 
     @PostConstruct
     private void init() {
+        dataDirectory = Utility.getEnvironmentVariable(Utility.DATA_DIRECTORY, ".");
         template = new Template();
         inputColumns = new ArrayList<>();
         container = new BeanItemContainer<>(TemplateProperty.class, template.getList());
@@ -80,7 +83,8 @@ public class TemplateManager {
     }
 
     public void loadTemplate() {
-        try (Reader reader = new InputStreamReader(new FileInputStream(templateBeanItem.getBean().getTemplateFileName()), "UTF-8")) {
+        try (Reader reader = new InputStreamReader(new FileInputStream(
+                getFileNameProper(templateBeanItem.getBean().getTemplateFileName(), "json")), "UTF-8")) {
             Gson gson = new GsonBuilder().create();
             Template tp = gson.fromJson(reader, Template.class
             );
@@ -98,7 +102,8 @@ public class TemplateManager {
     }
 
     public void saveTemplate() {
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(templateBeanItem.getBean().getTemplateFileName()), "UTF-8")) {
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(
+                getFileNameProper(templateBeanItem.getBean().getTemplateFileName(), "json")), "UTF-8")) {
             Gson gson = new GsonBuilder().create();
             Template tp = new Template();
             tp.getList().addAll(container.getItemIds());
@@ -123,7 +128,7 @@ public class TemplateManager {
         parserSettings.setHeaderExtractionEnabled(true);
         CsvParser parser = new CsvParser(parserSettings);
         // the 'parse' method will parse the file and delegate each parsed row to the RowProcessor you defined
-        parser.parse(getReader());
+        parser.parse(getReader("csv"));
         // get the parsed records from the RowListProcessor here.
         // Note that different implementations of RowProcessor will provide different sets of functionalities.
         dataContainer.removeAllItems();
@@ -153,28 +158,17 @@ public class TemplateManager {
         }
     }
 
-    private Reader getReader() {
+    private Reader getReader(String extension) {
         Reader reader = null;
         try {
-            reader = new InputStreamReader(new FileInputStream(templateBeanItem.getBean().getDataFileName()), "UTF-8");
+            reader = new InputStreamReader(new FileInputStream(
+                    getFileNameProper(templateBeanItem.getBean().getDataFileName(), extension)), "UTF-8");
         } catch (UnsupportedEncodingException | FileNotFoundException ex) {
             Logger.getLogger(TemplateManager.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
         return reader;
     }
-
-//    public void setDataFileName(String dataFileName) {
-//        this.dataFileName = dataFileName;
-//        boolean processed = false;
-//        if (dataFileName.toLowerCase().endsWith(".csv")) {
-//            readCsvData();
-//            processed = true;
-//        }
-//        if (processed) {
-//            notifyObservers();
-//        }
-//    }
 
     public BeanItemContainer<TemplateProperty> getContainer() {
         return container;
@@ -198,6 +192,25 @@ public class TemplateManager {
 
     public void setTemplateBeanItem(BeanItem<Template> templateBeanItem) {
         this.templateBeanItem = templateBeanItem;
+    }
+
+    public String getDataDirectory() {
+        return dataDirectory;
+    }
+
+    public void setDataDirectory(String dataDirectory) {
+        this.dataDirectory = dataDirectory;
+    }
+
+    private String getFileNameProper(String fileName, String extension) {
+        StringBuilder result = new StringBuilder();
+        result.append(dataDirectory);
+        result.append("/");
+        result.append(fileName);
+        if (!fileName.toLowerCase().endsWith(extension)) {
+            result.append(".").append(extension);
+        }
+        return result.toString();
     }
 
 }

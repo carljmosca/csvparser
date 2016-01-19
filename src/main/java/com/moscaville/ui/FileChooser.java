@@ -6,7 +6,6 @@
 package com.moscaville.ui;
 
 import com.moscaville.manager.TemplateManager;
-import com.moscaville.util.Utility;
 import com.vaadin.data.util.FilesystemContainer;
 import com.vaadin.event.MouseEvents;
 import com.vaadin.ui.Button;
@@ -69,7 +68,7 @@ public class FileChooser extends Window {
             caption = "Template files";
         }
         fileChooser.setCaption(caption);
-        File folder = new File(Utility.getEnvironmentVariable(Utility.DATA_DIRECTORY + "." + fileExtension, "."));
+        File folder = new File(templateManager.getDataDirectory());
         FilesystemContainer container = new FilesystemContainer(folder);
         fileChooser.setContainerDataSource(container);
         fileChooser.setItemIconPropertyId("Icon");
@@ -104,9 +103,11 @@ public class FileChooser extends Window {
         }
         File selectedFile = (File) fileChooser.getValue();
         if (FILE_EXTENSION_CSV.equals(fileExtension)) {
-            templateManager.getTemplateBeanItem().getItemProperty("dataFileName").setValue(selectedFile.getAbsoluteFile().getAbsolutePath());
+            templateManager.getTemplateBeanItem().getItemProperty("dataFileName").setValue(
+                    selectedFile.getName());
         } else if (FILE_EXTENSION_TEMPLATE.equals(fileExtension)) {
-            templateManager.getTemplateBeanItem().getItemProperty("templateFileName").setValue(selectedFile.getAbsoluteFile().getAbsolutePath());
+            templateManager.getTemplateBeanItem().getItemProperty("templateFileName").setValue(
+                    selectedFile.getName());
         }
         close();
     }
