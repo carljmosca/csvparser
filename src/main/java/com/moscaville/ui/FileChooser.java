@@ -104,9 +104,9 @@ public class FileChooser extends Window {
         }
         File selectedFile = (File) fileChooser.getValue();
         if (FILE_EXTENSION_CSV.equals(fileExtension)) {
-            templateManager.setDataFileName(selectedFile.getAbsoluteFile().getAbsolutePath());
+            templateManager.getTemplateBeanItem().getItemProperty("dataFileName").setValue(selectedFile.getAbsoluteFile().getAbsolutePath());
         } else if (FILE_EXTENSION_TEMPLATE.equals(fileExtension)) {
-            templateManager.setTemplateFileName(selectedFile.getAbsoluteFile().getAbsolutePath());
+            templateManager.getTemplateBeanItem().getItemProperty("templateFileName").setValue(selectedFile.getAbsoluteFile().getAbsolutePath());
         }
         close();
     }

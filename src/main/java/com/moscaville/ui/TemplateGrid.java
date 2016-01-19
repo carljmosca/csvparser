@@ -5,12 +5,13 @@
  */
 package com.moscaville.ui;
 
+import com.moscaville.bean.Template;
 import com.moscaville.manager.TemplateManager;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
+import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
-import java.util.Observable;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,10 +43,11 @@ public class TemplateGrid extends Grid {
         setContainerDataSource(wrapperContainer);
         setColumnOrder("dataColumn", "inputColumn", "dataType", "required");
         setEditors();
-        //getColumns().stream().forEach(c -> c.setSortable(false));
-        templateManager.addObserver((Observable o, Object arg) -> {
-            cmbInputColumn.removeAllItems();
-            cmbInputColumn.addItems(Arrays.asList(templateManager.getDataHeaders()));
+        templateManager.getTemplateBeanItem().getBean().addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            if (Template.PROP_DATAFILENAME.equals(evt.getPropertyName())) {
+                cmbInputColumn.removeAllItems();
+                cmbInputColumn.addItems(Arrays.asList(templateManager.getDataHeaders()));
+            }
         });
         setHeaderVisible(true);
     }

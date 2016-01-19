@@ -8,6 +8,7 @@ package com.moscaville.ui;
 import com.moscaville.manager.TemplateManager;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.Property;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
@@ -88,6 +89,10 @@ public class CsvVaadinUI extends UI {
             btnSave.setEnabled(tfTemplateFileName.getValue() != null && tfTemplateFileName.getValue().length() > 0);
         });
         templateGridHeaderLayout.addComponent(tfTemplateFileName);
+        
+        FieldGroup binder = new FieldGroup(templateManager.getTemplateBeanItem());
+        binder.setBuffered(false);
+        binder.bind(tfTemplateFileName, "templateFileName");
         
         Button btnData = new Button("Data", FontAwesome.DATABASE);
         btnData.setDescription("Load data");
